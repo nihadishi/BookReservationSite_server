@@ -7,12 +7,12 @@ const reservationRoutes = require('./routes/reservationRoutes');
 const cors = require("cors");
 
 const app = express();
-const port = 3030;
+const port = 2021;
 
 app.use(
     cors({
       credentials: true,
-      origin: 'http://localhost:3000',
+      origin: 'http://localhost:2020',
     })
   );
 app.use(bodyParser.json());
