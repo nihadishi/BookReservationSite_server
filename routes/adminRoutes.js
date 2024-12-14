@@ -184,4 +184,139 @@ router.get('/data/books', (req, res) => {
       res.status(200).json({ message: 'Award deleted successfully' });
     });
   });
+
+
+  router.get('/data/warehouses', (req, res) => {
+    const sql = 'SELECT * FROM Warehouse';
+    db.query(sql, (err, results) => {
+      if (err) return res.status(500).json({ message: 'Database error', error: err });
+      res.status(200).json(results);
+    });
+  });
+  
+  // Add a new warehouse
+  router.post('/data/warehouses/add', (req, res) => {
+    const { Address, Phone, Code } = req.body;
+    const sql = 'INSERT INTO Warehouse (Address, Phone, Code) VALUES (?, ?, ?)';
+    db.query(sql, [Address, Phone, Code], (err, results) => {
+      if (err) return res.status(500).json({ message: 'Database error', error: err });
+      res.status(201).json({ WarehouseID: results.insertId, Address, Phone, Code });
+    });
+  });
+  
+  // Edit an existing warehouse
+  router.put('/data/warehouses/edit/:id', (req, res) => {
+    const { id } = req.params;
+    const { Address, Phone, Code } = req.body;
+    const sql = 'UPDATE Warehouse SET Address = ?, Phone = ?, Code = ? WHERE WarehouseID = ?';
+    db.query(sql, [Address, Phone, Code, id], (err) => {
+      if (err) return res.status(500).json({ message: 'Database error', error: err });
+      res.status(200).json({ message: 'Warehouse updated successfully' });
+    });
+  });
+  
+  // Delete a warehouse
+  router.delete('/data/warehouses/delete/:id', (req, res) => {
+    const { id } = req.params;
+    const sql = 'DELETE FROM Warehouse WHERE WarehouseID = ?';
+    db.query(sql, [id], (err) => {
+      if (err) return res.status(500).json({ message: 'Database error', error: err });
+      res.status(200).json({ message: 'Warehouse deleted successfully' });
+    });
+  });
+  
+
+
+  router.get('/data/contains', (req, res) => {
+    const sql = 'SELECT * FROM Contains';
+    db.query(sql, (err, results) => {
+      if (err) return res.status(500).json({ message: 'Database error', error: err });
+      res.status(200).json(results);
+    });
+  });
+  
+  // Add a new contains entry
+  router.post('/data/contains/add', (req, res) => {
+    const { BasketID, BookID, Number } = req.body;
+    const sql = 'INSERT INTO Contains (BasketID, BookID, Number) VALUES (?, ?, ?)';
+    db.query(sql, [BasketID, BookID, Number], (err, results) => {
+      if (err) return res.status(500).json({ message: 'Database error', error: err });
+      res.status(201).json({ BasketID, BookID, Number });
+    });
+  });
+  
+  // Edit an existing contains entry
+  router.put('/data/contains/edit/:basketID/:bookID', (req, res) => {
+    const { basketID, bookID } = req.params;
+    const { Number } = req.body;
+    const sql = 'UPDATE Contains SET Number = ? WHERE BasketID = ? AND BookID = ?';
+    db.query(sql, [Number, basketID, bookID], (err) => {
+      if (err) return res.status(500).json({ message: 'Database error', error: err });
+      res.status(200).json({ message: 'Item updated successfully' });
+    });
+  });
+  
+  // Delete a contains entry
+  router.delete('/data/contains/delete/:basketID/:bookID', (req, res) => {
+    const { basketID, bookID } = req.params;
+    const sql = 'DELETE FROM Contains WHERE BasketID = ? AND BookID = ?';
+    db.query(sql, [basketID, bookID], (err) => {
+      if (err) return res.status(500).json({ message: 'Database error', error: err });
+      res.status(200).json({ message: 'Item deleted successfully' });
+    });
+  });
+
+
+  router.get('/data/inventories', (req, res) => {
+    const sql = `
+      SELECT 
+        i.BookID, i.WarehouseID, i.Number,
+        b.Title AS BookTitle, w.Address AS WarehouseAddress
+      FROM Inventory i
+      LEFT JOIN Book b ON i.BookID = b.BookID
+      LEFT JOIN Warehouse w ON i.WarehouseID = w.WarehouseID
+    `;
+    db.query(sql, (err, results) => {
+      if (err) return res.status(500).json({ message: 'Database error', error: err });
+      res.status(200).json(results);
+    });
+  });
+  
+  // Add inventory
+  router.post('/data/inventories/add', (req, res) => {
+    const { BookID, WarehouseID, Number } = req.body;
+    if (!BookID || !WarehouseID || Number === undefined) {
+      return res.status(400).json({ message: 'BookID, WarehouseID, and Number are required' });
+    }
+  
+    const sql = 'INSERT INTO Inventory (BookID, WarehouseID, Number) VALUES (?, ?, ?)';
+    db.query(sql, [BookID, WarehouseID, Number], (err) => {
+      if (err) return res.status(500).json({ message: 'Database error', error: err });
+      res.status(201).json({ BookID, WarehouseID, Number });
+    });
+  });
+  
+  // Edit inventory
+  router.put('/data/inventories/edit/:bookID/:warehouseID', (req, res) => {
+    const { bookID, warehouseID } = req.params;
+    const { Number } = req.body;
+  
+    const sql = 'UPDATE Inventory SET Number = ? WHERE BookID = ? AND WarehouseID = ?';
+    db.query(sql, [Number, bookID, warehouseID], (err) => {
+      if (err) return res.status(500).json({ message: 'Database error', error: err });
+      res.status(200).json({ message: 'Inventory updated successfully' });
+    });
+  });
+  
+  // Delete inventory
+  router.delete('/data/inventories/delete/:bookID/:warehouseID', (req, res) => {
+    const { bookID, warehouseID } = req.params;
+  
+    const sql = 'DELETE FROM Inventory WHERE BookID = ? AND WarehouseID = ?';
+    db.query(sql, [bookID, warehouseID], (err) => {
+      if (err) return res.status(500).json({ message: 'Database error', error: err });
+      res.status(200).json({ message: 'Inventory deleted successfully' });
+    });
+  });
+  
 module.exports = router;
