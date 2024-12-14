@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../db'); // Database connection module (to be created)
+const logger = require('../logger');
 
 const router = express.Router();
 const JWT_SECRET = 'nihad.tech';
@@ -28,7 +29,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
   console.log(req.body);
-  
+  logger.info(`Login attempt for email: ${email}`);
   const sql = 'SELECT * FROM Customer WHERE Email = ?';
   db.query(sql, [email], async (err, results) => {
     console.log(results);
@@ -43,6 +44,7 @@ router.post('/login', (req, res) => {
     if (!match) return res.status(400).json({ message: 'Incorrect password' });
 
     const token = jwt.sign({ id: user.CustomerID, name:user.Name, email: user.Email }, JWT_SECRET, { expiresIn: '1h' });
+    logger.info(`User logged in successfully: ${email}`);
     res.status(200).json({ message: 'Login successful', token });
   });
 });
