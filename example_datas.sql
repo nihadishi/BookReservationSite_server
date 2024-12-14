@@ -38,7 +38,10 @@ INSERT INTO Customer (Name, Password, Email, Phone, Address)
 VALUES 
 ('Nihad Maharramov', '1234', 'nihadishi@gmail.com', '555-1000', '101 Maple Street'),
 ('Daisy Sun', '12334', 'daisy@mail.com', '555-2000', '202 Oak Avenue'),
-('Liam Cloud', '12334', 'liam@mail.com', '555-3000', '303 Pine Road');
+('Liam Cloud', '12334', 'liam@mail.com', '555-3000', '303 Pine Road'),
+('Nihad Maharramov','$2b$10$E/XpYSDiPOUtBj1SoK.zYuLaKhD8ayvt/qWFK7.TjdgGHx1prD/oG','nihad@gmail.com','123-4567','Azerbaijan'),
+('Nihad Admin','$2b$10$3WIW9FMDZIEfw/hBpWLwaOJk.NNyVa4.cai.BSoiqh94kbairEO6G','nihad@admin.com','000-0000','Admin Location'); 
+-- all password is 12345( admin too (Nihad Admin & Nihad))
 
 -- Insert Warehouses
 INSERT INTO Warehouse (Address, Phone, Code)
