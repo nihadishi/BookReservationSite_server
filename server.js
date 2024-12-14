@@ -4,6 +4,7 @@ const authRoutes = require('./routes/authRoutes');
 const bookRoutes = require('./routes/bookRoutes');
 const userRoutes = require('./routes/userRoutes');
 const reservationRoutes = require('./routes/reservationRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const cors = require("cors");
 
 const app = express();
@@ -24,6 +25,7 @@ app.use('/auth', authRoutes);
 app.use('/books', bookRoutes);
 app.use('/user', userRoutes);
 app.use('/reservations', reservationRoutes);
+app.use('/admin', adminRoutes);
 
 // Start Server
 app.listen(port, () => {

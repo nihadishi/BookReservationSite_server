@@ -46,5 +46,18 @@ router.post('/login', (req, res) => {
     res.status(200).json({ message: 'Login successful', token });
   });
 });
+router.post('/checkToken', (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
 
+  if (!token) {
+    return res.status(401).json({ valid: false, message: 'Unauthorized. No token provided.' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    return res.status(200).json({ valid: true, decoded });
+  } catch (error) {
+    return res.status(401).json({ valid: false, message: 'Invalid token', error: error.message });
+  }
+});
 module.exports = router;
