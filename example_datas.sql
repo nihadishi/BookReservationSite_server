@@ -24,16 +24,14 @@ VALUES
 ('The Last Horizon', 2021, 25.00, '5544332211', 'Science Fiction'),
 ('Whispers of Time', 2010, 19.99, '6677889900', 'Fantasy');
 
--- Insert Written_by
 INSERT INTO Written_by (AuthorID, BookID)
 VALUES 
-(1, 1), -- Anna White wrote "The Silent River"
-(2, 2), -- Brandon Green wrote "Dreams of the Sky"
-(3, 3), -- Clara Red wrote "Echoes in the Dark"
-(4, 4), -- David Black wrote "The Last Horizon"
-(5, 5); -- Elena Blue wrote "Whispers of Time"
+(1, 1), 
+(2, 2),
+(3, 3), 
+(4, 4), 
+(5, 5); 
 
--- Insert Customers
 INSERT INTO Customer (Name, Password, Email, Phone, Address)
 VALUES 
 ('Nihad Maharramov', '1234', 'nihadishi@gmail.com', '555-1000', '101 Maple Street'),
@@ -43,13 +41,11 @@ VALUES
 ('Nihad Admin','$2b$10$3WIW9FMDZIEfw/hBpWLwaOJk.NNyVa4.cai.BSoiqh94kbairEO6G','nihad@admin.com','000-0000','Admin Location'); 
 -- all password is 12345( admin too (Nihad Admin & Nihad))
 
--- Insert Warehouses
 INSERT INTO Warehouse (Address, Phone, Code)
 VALUES 
 ('Central Warehouse', '555-1111', 'CW001'),
 ('North Warehouse', '555-2222', 'NW001');
 
--- Insert Inventory
 INSERT INTO Inventory (BookID, WarehouseID, Number)
 VALUES 
 (1, 1, 30),

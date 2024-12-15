@@ -22,14 +22,13 @@ app.use(bodyParser.json());
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(requestLogger);
-// Routes
+
 app.use('/auth', authRoutes);
 app.use('/books', bookRoutes);
 app.use('/user', userRoutes);
 app.use('/reservations', reservationRoutes);
 app.use('/admin', adminRoutes);
 
-// Start Server
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

@@ -165,7 +165,6 @@ router.post('/basket/add', (req, res) => {
     }
   });
 
-  // Function to Add Book to Basket
   const addToBasket = (BasketID) => {
     db.beginTransaction((transactionErr) => {
       if (transactionErr) return res.status(500).json({ message: 'Transaction error', error: transactionErr });
