@@ -125,7 +125,6 @@ router.post('/basket/add', (req, res) => {
   const { BookID, Count } = req.body;
 
   const token = req.headers.authorization?.split(' ')[1];
-
   if (!token) return res.status(401).json({ message: 'Unauthorized' });
 
   const decoded = jwt.verify(token, JWT_SECRET);
@@ -158,12 +157,9 @@ router.post('/basket/add', (req, res) => {
         if (err) return res.status(500).json({ message: 'Database error', error: err });
 
         const newBasketID = createResults.insertId;
-
-        // Step 3: Add the book to the newly created basket
         addToBasket(newBasketID);
       });
     } else {
-      // If a basket exists, add the book to it
       const existingBasketID = results[0].BasketID;
       addToBasket(existingBasketID);
     }
@@ -171,18 +167,53 @@ router.post('/basket/add', (req, res) => {
 
   // Function to Add Book to Basket
   const addToBasket = (BasketID) => {
-    const sqlAddToBasket = `
-      INSERT INTO Contains (BasketID, BookID, Number)
-      VALUES (?, ?, ?)
-      ON DUPLICATE KEY UPDATE Number = Number + VALUES(Number)
-    `;
+    db.beginTransaction((transactionErr) => {
+      if (transactionErr) return res.status(500).json({ message: 'Transaction error', error: transactionErr });
 
-    db.query(sqlAddToBasket, [BasketID, BookID, Count], (err) => {
-      if (err) return res.status(500).json({ message: 'Database error', error: err });
-      res.status(200).json({ message: 'Book added to basket' });
+      const sqlAddToBasket = `
+        INSERT INTO Contains (BasketID, BookID, Number)
+        VALUES (?, ?, ?)
+        ON DUPLICATE KEY UPDATE Number = Number + VALUES(Number)
+      `;
+
+      // Step 3: Add to Basket
+      db.query(sqlAddToBasket, [BasketID, BookID, Count], (err) => {
+        if (err) {
+          return db.rollback(() => {
+            res.status(500).json({ message: 'Database error', error: err });
+          });
+        }
+
+        // Step 4: Subtract Count from Inventory
+        const sqlUpdateInventory = `
+          UPDATE Inventory
+          SET Number = Number - ?
+          WHERE BookID = ? AND Number >= ?
+        `;
+
+        db.query(sqlUpdateInventory, [Count, BookID, Count], (updateErr, results) => {
+          if (updateErr || results.affectedRows === 0) {
+            return db.rollback(() => {
+              res.status(400).json({ message: 'Insufficient stock or database error', error: updateErr });
+            });
+          }
+
+          // Commit the transaction if successful
+          db.commit((commitErr) => {
+            if (commitErr) {
+              return db.rollback(() => {
+                res.status(500).json({ message: 'Transaction commit error', error: commitErr });
+              });
+            }
+
+            res.status(200).json({ message: 'Book added to basket, stock updated successfully' });
+          });
+        });
+      });
     });
   };
 });
+
 router.get('/baskets', (req, res) => {
   const token = req.headers.authorization?.split(' ')[1];
 
